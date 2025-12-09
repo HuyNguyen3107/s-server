@@ -11,18 +11,28 @@ COPY prisma ./prisma
 COPY scripts ./scripts
 COPY src ./src
 
-RUN node scripts/prisma-clean-generate.js
+RUN npx prisma generate
 RUN npm run build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
+# Cài đặt các dependencies cần thiết
+RUN apk add --no-cache openssl
+
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+# Cài đặt tất cả dependencies vì cần ts-node cho seed
+RUN npm ci && npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
 COPY prisma ./prisma
+COPY scripts ./scripts
+COPY tsconfig.json ./
+
+# Tạo prisma client trong runner stage
+RUN npx prisma generate
 
 EXPOSE 3001
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "scripts/start-prod.js"]
+

@@ -3,8 +3,17 @@ import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+// Lấy thông tin super admin từ biến môi trường hoặc dùng mặc định
+const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL || 'superadmin@soligant.com';
+const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD || 'SuperAdmin@2024';
+const SUPER_ADMIN_NAME = process.env.SUPER_ADMIN_NAME || 'Super Administrator';
+const SUPER_ADMIN_PHONE = process.env.SUPER_ADMIN_PHONE || '0999999999';
+
 async function seedSuperAdmin() {
   try {
+    console.log('🚀 Bắt đầu tạo Super Admin...');
+    console.log(`📧 Email: ${SUPER_ADMIN_EMAIL}`);
+
     // Đảm bảo role Super Admin tồn tại với isDeletable = false
     const superAdminRole = await prisma.role.upsert({
       where: { name: 'Super Admin' },
@@ -16,6 +25,7 @@ async function seedSuperAdmin() {
         isDeletable: false, // Không thể xóa
       },
     });
+    console.log('✅ Role Super Admin đã được tạo/cập nhật');
 
     // Tạo tất cả permissions và gán cho Super Admin (68 quyền)
     const permissions = [
@@ -150,6 +160,7 @@ async function seedSuperAdmin() {
       });
       createdPermissions.push(permission);
     }
+    console.log(`✅ Đã tạo/cập nhật ${createdPermissions.length} permissions`);
 
     // Xóa các permissions cũ của Super Admin role
     await prisma.rolePermission.deleteMany({
@@ -163,28 +174,30 @@ async function seedSuperAdmin() {
         permissionId: permission.id,
       })),
     });
+    console.log('✅ Đã gán tất cả permissions cho Super Admin role');
 
-    // Hash mật khẩu mặc định
-    const defaultPassword = 'SuperAdmin@2024';
-    const passwordHash = await bcrypt.hash(defaultPassword, 10);
+    // Hash mật khẩu
+    const passwordHash = await bcrypt.hash(SUPER_ADMIN_PASSWORD, 10);
 
     // Tạo tài khoản Super Admin với isDeletable = false
     const superAdmin = await prisma.user.upsert({
-      where: { email: 'superadmin@soligant.com' },
+      where: { email: SUPER_ADMIN_EMAIL },
       update: {
         passwordHash,
+        name: SUPER_ADMIN_NAME,
         isActive: true,
         isDeletable: false, // Không thể xóa
       },
       create: {
-        email: 'superadmin@soligant.com',
+        email: SUPER_ADMIN_EMAIL,
         passwordHash,
-        name: 'Super Administrator',
-        phone: '0999999999',
+        name: SUPER_ADMIN_NAME,
+        phone: SUPER_ADMIN_PHONE,
         isActive: true,
         isDeletable: false, // Không thể xóa
       },
     });
+    console.log(`✅ Tài khoản Super Admin đã được tạo/cập nhật: ${superAdmin.email}`);
 
     // Gán Super Admin role cho user
     await prisma.userRole.upsert({
@@ -200,6 +213,8 @@ async function seedSuperAdmin() {
         roleId: superAdminRole.id,
       },
     });
+    console.log('✅ Đã gán role Super Admin cho user');
+    console.log('🎉 Super Admin đã được tạo thành công!');
   } catch (error) {
     console.error('❌ Lỗi khi tạo Super Admin:', error);
     throw error;
