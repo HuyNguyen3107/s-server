@@ -1,0 +1,82 @@
+### Permissions API Tests
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### 1. Tạo quyền hạn mới
+POST {{baseUrl}}/permissions
+Content-Type: {{contentType}}
+
+{
+  "name": "TEST_PERMISSION"
+}
+
+### 2. Tạo nhiều quyền hạn cùng lúc
+POST {{baseUrl}}/permissions/bulk
+Content-Type: {{contentType}}
+
+{
+  "names": ["PERMISSION_1", "PERMISSION_2", "PERMISSION_3"]
+}
+
+### 3. Lấy danh sách tất cả quyền hạn
+GET {{baseUrl}}/permissions
+
+### 4. Lấy danh sách quyền hạn với tìm kiếm
+GET {{baseUrl}}/permissions?search=USER&page=1&limit=5
+
+### 5. Lấy danh sách quyền hạn với phân trang
+GET {{baseUrl}}/permissions?page=1&limit=3
+
+### 6. Lấy thông tin chi tiết quyền hạn (cần thay ID thực tế)
+# @name getPermission
+GET {{baseUrl}}/permissions/123e4567-e89b-12d3-a456-426614174000
+
+### 7. Lấy quyền hạn theo danh sách tên
+POST {{baseUrl}}/permissions/by-names
+Content-Type: {{contentType}}
+
+{
+  "names": ["USER_CREATE", "USER_READ"]
+}
+
+### 8. Cập nhật quyền hạn (cần thay ID thực tế)
+PATCH {{baseUrl}}/permissions/123e4567-e89b-12d3-a456-426614174000
+Content-Type: {{contentType}}
+
+{
+  "name": "UPDATED_PERMISSION"
+}
+
+### 9. Kiểm tra quyền hạn có tồn tại (cần thay ID thực tế)
+GET {{baseUrl}}/permissions/123e4567-e89b-12d3-a456-426614174000/exists
+
+### 10. Xóa quyền hạn (cần thay ID thực tế)
+DELETE {{baseUrl}}/permissions/123e4567-e89b-12d3-a456-426614174000
+
+### 11. Test validation - Tạo quyền hạn với tên trống (sẽ lỗi)
+POST {{baseUrl}}/permissions
+Content-Type: {{contentType}}
+
+{
+  "name": ""
+}
+
+### 12. Test validation - Tạo quyền hạn với tên quá dài (sẽ lỗi)
+POST {{baseUrl}}/permissions
+Content-Type: {{contentType}}
+
+{
+  "name": "THIS_IS_A_VERY_LONG_PERMISSION_NAME_THAT_EXCEEDS_THE_MAXIMUM_LENGTH_LIMIT_OF_100_CHARACTERS_AND_SHOULD_CAUSE_VALIDATION_ERROR"
+}
+
+### 13. Test conflict - Tạo quyền hạn trùng tên (sẽ lỗi)
+POST {{baseUrl}}/permissions
+Content-Type: {{contentType}}
+
+{
+  "name": "TEST_PERMISSION"
+}
+
+### 14. Test not found - Lấy quyền hạn không tồn tại (sẽ lỗi)
+GET {{baseUrl}}/permissions/00000000-0000-0000-0000-000000000000

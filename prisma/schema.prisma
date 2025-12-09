@@ -1,0 +1,293 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  phone        String   @unique
+  isActive     Boolean  @default(true) @map("is_active")
+  isDeletable  Boolean  @default(true) @map("is_deletable")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  // relations
+  refreshTokens RefreshToken[]
+  orders        Order[]
+  userRoles     UserRole[]
+
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  isDeletable Boolean  @default(true) @map("is_deletable")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // relations
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // relations
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model UserRole {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  roleId String @map("role_id")
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, roleId], name: "idx_user_roles_unique")
+  @@index([roleId], name: "idx_user_roles_role")
+  @@map("user_roles")
+}
+
+model RolePermission {
+  id           String @id @default(uuid())
+  roleId       String @map("role_id")
+  permissionId String @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId], name: "idx_role_permissions_unique")
+  @@index([permissionId], name: "idx_role_permissions_permission")
+  @@map("role_permissions")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  token     String    @unique
+  expiresAt String    @unique @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "idx_refresh_tokens_user")
+  @@map("refresh_tokens")
+}
+
+model BlacklistToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("blacklist_token")
+}
+
+model Collection {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  imageUrl  String   @map("image_url")
+  routeName String   @map("route_name")
+  isHot     Boolean? @map("is_hot")
+  status    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  products Product[]
+
+  @@map("collections")
+}
+
+model Product {
+  id           String   @id @default(uuid())
+  name         String
+  collectionId String   @map("collection_id")
+  status       String?
+  hasBg        Boolean? @map("has_bg")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  collection      Collection        @relation(fields: [collectionId], references: [id])
+  productVariants ProductVariant[]
+  categories      ProductCategory[]
+  backgrounds     Background[]
+
+  @@index([collectionId], name: "idx_products_collection")
+  @@map("products")
+}
+
+model ProductVariant {
+  id          String   @id @default(uuid())
+  productId   String   @map("product_id")
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  endow       Json?
+  option      Json?
+  config      Json?
+  status      String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([productId], name: "idx_product_variants_product")
+  @@map("product_variants")
+}
+
+model ProductCategory {
+  id        String   @id @default(uuid())
+  productId String   @map("product_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  product        Product         @relation(fields: [productId], references: [id])
+  productCustoms ProductCustom[]
+
+  @@index([productId], name: "idx_product_categories_product")
+  @@map("product_categories")
+}
+
+model ProductCustom {
+  id                String   @id @default(uuid())
+  productCategoryId String   @map("product_category_id")
+  name              String
+  imageUrl          String   @map("image_url")
+  price             Decimal? @db.Decimal(10, 2)
+  description       String?
+  status            String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @map("updated_at")
+
+  productCategory ProductCategory @relation(fields: [productCategoryId], references: [id])
+  inventories     Inventory[]
+
+  @@index([productCategoryId], name: "idx_product_customs_category")
+  @@map("product_customs")
+}
+
+model Background {
+  id          String   @id @default(uuid())
+  productId   String   @map("product_id")
+  name        String?
+  description String?
+  imageUrl    String   @map("image_url")
+  config      Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([productId], name: "idx_backgrounds_product")
+  @@map("backgrounds")
+}
+
+model Feedback {
+  id           String   @id @default(uuid())
+  customerName String   @map("customer_name")
+  content      String
+  imageUrl     String   @map("image_url")
+  rating       Int
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  @@map("feedbacks")
+}
+
+model Promotion {
+  id                String    @id @default(uuid())
+  title             String
+  description       String
+  type              String
+  value             Decimal   @db.Decimal(10, 2)
+  minOrderValue     Decimal   @default(0) @map("min_order_value") @db.Decimal(10, 2)
+  maxDiscountAmount Decimal?  @map("max_discount_amount") @db.Decimal(10, 2)
+  startDate         DateTime  @map("start_date")
+  endDate           DateTime? @map("end_date")
+  usageLimit        Int?      @map("usage_limit")
+  usageCount        Int?      @map("usage_count")
+  isActive          Boolean?  @map("is_active")
+  promoCode         String    @map("promoCode")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @map("updated_at")
+
+  @@index([promoCode], name: "idx_promotions_promocode")
+  @@index([isActive, startDate], name: "idx_promotions_active_start")
+  @@map("promotions")
+}
+
+model Inventory {
+  id              String   @id @default(uuid())
+  productCustomId String   @map("product_custom_id")
+  currentStock    Int?     @map("current_stock")
+  reservedStock   Int?     @map("reserved_stock")
+  minStockAlert   Int?     @map("min_stock_alert")
+  status          String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  productCustom ProductCustom @relation(fields: [productCustomId], references: [id])
+
+  @@index([productCustomId], name: "idx_inventory_product_custom")
+  @@map("inventory")
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  userId      String?  @map("user_id")
+  status      String?
+  information Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "idx_orders_user")
+  @@map("orders")
+}
+
+model ShippingFee {
+  id                    String   @id @default(uuid())
+  shippingType          String   @map("shipping_type")
+  area                  String
+  estimatedDeliveryTime String   @map("estimated_delivery_time")
+  shippingFee           Decimal  @map("shipping_fee") @db.Decimal(10, 2)
+  notesOrRemarks        String?  @map("notes_or_remarks")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @default(now()) @map("updated_at")
+
+  @@map("shipping_fees")
+}
+
+model Information {
+  id        String   @id @default(uuid())
+  config    Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("informations")
+}

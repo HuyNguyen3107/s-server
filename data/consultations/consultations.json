@@ -1,0 +1,70 @@
+[
+  {
+    "id": "consult_1764052668328_cc0ki0u",
+    "customerName": "nam",
+    "phoneNumber": "0979952319",
+    "status": "contacted",
+    "createdAt": "2025-11-25T06:37:48.329Z",
+    "updatedAt": "2025-11-25T07:17:09.220Z"
+  },
+  {
+    "id": "consult_1764052241734_xqi6bel",
+    "customerName": "Huy",
+    "phoneNumber": "0987654321",
+    "status": "pending",
+    "createdAt": "2025-11-25T06:30:41.734Z",
+    "updatedAt": "2025-11-25T06:30:41.734Z"
+  },
+  {
+    "id": "consult_1762919213102_w67fzkh",
+    "customerName": "huy",
+    "phoneNumber": "0987654321",
+    "status": "pending",
+    "createdAt": "2025-11-12T03:46:53.102Z",
+    "updatedAt": "2025-11-12T03:46:53.102Z"
+  },
+  {
+    "id": "consult_1760860732333_mup4b86",
+    "customerName": "hita",
+    "phoneNumber": "01273153826",
+    "status": "contacted",
+    "createdAt": "2025-10-19T07:58:52.333Z",
+    "updatedAt": "2025-10-23T07:07:14.328Z",
+    "assignedTo": {
+      "userId": "892d4395-4ea7-4610-97be-02c6e3600a01",
+      "userName": "Super Administrator"
+    }
+  },
+  {
+    "id": "consult_1760860701034_bty0mbf",
+    "customerName": "Hp",
+    "phoneNumber": "0988315225",
+    "status": "pending",
+    "createdAt": "2025-10-19T07:58:21.034Z",
+    "updatedAt": "2025-10-19T07:58:21.034Z"
+  },
+  {
+    "id": "consult_1760860429692_q1nj94g",
+    "customerName": "Huy",
+    "phoneNumber": "0987654321",
+    "status": "contacted",
+    "createdAt": "2025-10-19T07:53:49.692Z",
+    "updatedAt": "2025-10-23T07:11:52.480Z",
+    "assignedTo": {
+      "userId": "892d4395-4ea7-4610-97be-02c6e3600a01",
+      "userName": "Super Administrator"
+    }
+  },
+  {
+    "id": "consult_1760688691900_tga4nq0",
+    "customerName": "Huy",
+    "phoneNumber": "0987654321",
+    "status": "contacted",
+    "createdAt": "2025-10-17T08:11:31.900Z",
+    "updatedAt": "2025-10-17T08:28:55.110Z",
+    "assignedTo": {
+      "userId": "f03a3948-a660-4019-a54d-6e90baf482ee",
+      "userName": "Huy"
+    }
+  }
+]
