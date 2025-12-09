@@ -4,8 +4,10 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 // Lấy thông tin super admin từ biến môi trường hoặc dùng mặc định
-const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL || 'superadmin@soligant.com';
-const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD || 'SuperAdmin@2024';
+const SUPER_ADMIN_EMAIL =
+  process.env.SUPER_ADMIN_EMAIL || 'superadmin@soligant.com';
+const SUPER_ADMIN_PASSWORD =
+  process.env.SUPER_ADMIN_PASSWORD || 'SuperAdmin@2024';
 const SUPER_ADMIN_NAME = process.env.SUPER_ADMIN_NAME || 'Super Administrator';
 const SUPER_ADMIN_PHONE = process.env.SUPER_ADMIN_PHONE || '0999999999';
 
@@ -197,7 +199,9 @@ async function seedSuperAdmin() {
         isDeletable: false, // Không thể xóa
       },
     });
-    console.log(`✅ Tài khoản Super Admin đã được tạo/cập nhật: ${superAdmin.email}`);
+    console.log(
+      `✅ Tài khoản Super Admin đã được tạo/cập nhật: ${superAdmin.email}`,
+    );
 
     // Gán Super Admin role cho user
     await prisma.userRole.upsert({

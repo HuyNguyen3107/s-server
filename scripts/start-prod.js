@@ -29,7 +29,7 @@ async function main() {
 
   // Chờ database sẵn sàng (quan trọng cho Railway)
   log('⏳ Chờ database sẵn sàng...');
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
   // Chạy Prisma migrations
   if (!runCommand('npx prisma migrate deploy', 'Chạy database migrations')) {
@@ -40,10 +40,10 @@ async function main() {
   log('👤 Tạo Super Admin...');
   try {
     // Sử dụng ts-node để chạy seed script
-    execSync('npx ts-node --transpile-only scripts/seed-super-admin.ts', { 
-      stdio: 'inherit', 
+    execSync('npx ts-node --transpile-only scripts/seed-super-admin.ts', {
+      stdio: 'inherit',
       cwd: process.cwd(),
-      env: { ...process.env }
+      env: { ...process.env },
     });
     log('✅ Super Admin đã được tạo/cập nhật!');
   } catch (error) {
@@ -56,7 +56,7 @@ async function main() {
   const app = spawn('node', ['dist/src/main.js'], {
     stdio: 'inherit',
     cwd: process.cwd(),
-    env: { ...process.env }
+    env: { ...process.env },
   });
 
   app.on('error', (error) => {

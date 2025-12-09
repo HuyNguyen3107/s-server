@@ -38,6 +38,7 @@ railway up
 Trong Railway Dashboard, vào **Settings** → **Variables**, thêm các biến sau:
 
 ### Bắt buộc:
+
 ```
 PORT=3001
 NODE_ENV=production
@@ -46,6 +47,7 @@ JWT_REFRESH_SECRET=<your-secure-refresh-secret>
 ```
 
 ### Tùy chọn (Super Admin - nếu không set sẽ dùng mặc định):
+
 ```
 SUPER_ADMIN_EMAIL=admin@yourdomain.com
 SUPER_ADMIN_PASSWORD=YourSecurePassword123!
@@ -54,6 +56,7 @@ SUPER_ADMIN_PHONE=0123456789
 ```
 
 ### Cloudinary (nếu sử dụng upload ảnh):
+
 ```
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
@@ -96,14 +99,17 @@ railway logs
 ## 🔧 Troubleshooting
 
 ### Lỗi kết nối database
+
 - Kiểm tra đã liên kết PostgreSQL với app chưa
 - Kiểm tra `DATABASE_URL` đã được inject chưa
 
 ### Lỗi migration
+
 - Xem logs để biết chi tiết lỗi
 - Có thể cần reset database nếu schema conflict
 
 ### App không start
+
 - Kiểm tra PORT đã set là 3001
 - Xem logs để biết lỗi cụ thể
 
@@ -117,6 +123,7 @@ railway logs
 ## 📊 Monitoring
 
 Railway cung cấp:
+
 - Metrics về CPU, Memory, Network
 - Logs realtime
 - Deploy history
