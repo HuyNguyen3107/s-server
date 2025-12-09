@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  SetMetadata,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -16,15 +17,20 @@ import { LogoutAuthDto } from './dto/logout-auth.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtGuard, GetUser, UserPayload } from './index';
 
+// Custom decorator to mark routes as public
+const Public = () => SetMetadata('isPublic', true);
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post()
   create(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.create(createAuthDto);
   }
 
+  @Public()
   @Post('login')
   async login(@Body() loginDto: LoginAuthDto) {
     return this.authService.login(loginDto);
@@ -36,6 +42,7 @@ export class AuthController {
     return this.authService.logout(logoutDto);
   }
 
+  @Public()
   @Post('refresh')
   async refresh(@Body() refreshDto: RefreshTokenDto) {
     return this.authService.refreshToken(refreshDto);
