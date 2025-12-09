@@ -31,6 +31,9 @@ async function main() {
   log('⏳ Chờ database sẵn sàng...');
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
+  // Generate Prisma Client (đảm bảo client được tạo đúng)
+  runCommand('npx prisma generate', 'Generate Prisma Client');
+
   // Chạy Prisma migrations
   if (!runCommand('npx prisma migrate deploy', 'Chạy database migrations')) {
     log('⚠️ Migrations có thể đã được áp dụng hoặc có lỗi. Tiếp tục...');
