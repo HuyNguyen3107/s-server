@@ -1,6 +1,7 @@
 /**
  * Production startup script
  * - Chạy Prisma migrations
+ * - Đồng bộ permissions (xóa quyền cũ, thêm quyền mới)
  * - Seed Super Admin
  * - Start NestJS application
  */
@@ -39,10 +40,23 @@ async function main() {
     log('⚠️ Migrations có thể đã được áp dụng hoặc có lỗi. Tiếp tục...');
   }
 
-  // Seed Super Admin
+  // Sync Permissions (xóa quyền cũ, thêm quyền mới, cập nhật Super Admin)
+  log('🔐 Đồng bộ permissions...');
+  try {
+    execSync('npx ts-node --transpile-only scripts/sync-permissions.ts', {
+      stdio: 'inherit',
+      cwd: process.cwd(),
+      env: { ...process.env },
+    });
+    log('✅ Permissions đã được đồng bộ!');
+  } catch (error) {
+    log(`⚠️ Lỗi khi đồng bộ permissions: ${error.message}`);
+    log('⚠️ Tiếp tục khởi động ứng dụng...');
+  }
+
+  // Seed Super Admin (tạo user nếu chưa có)
   log('👤 Tạo Super Admin...');
   try {
-    // Sử dụng ts-node để chạy seed script
     execSync('npx ts-node --transpile-only scripts/seed-super-admin.ts', {
       stdio: 'inherit',
       cwd: process.cwd(),

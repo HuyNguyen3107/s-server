@@ -11,6 +11,10 @@ sleep 5
 echo "🔄 Running database migrations..."
 npx prisma migrate deploy
 
+# Đồng bộ permissions (xóa quyền cũ, thêm quyền mới)
+echo "🔐 Syncing permissions..."
+npx ts-node --transpile-only scripts/sync-permissions.ts
+
 # Chạy seed super admin
 echo "👤 Seeding Super Admin..."
 npx ts-node --transpile-only scripts/seed-super-admin.ts
