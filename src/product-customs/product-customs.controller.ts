@@ -10,6 +10,8 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
+  SetMetadata,
 } from '@nestjs/common';
 import { ProductCustomsService } from './product-customs.service';
 import {
@@ -21,19 +23,32 @@ import {
   ProductCustomWithRelations,
   PaginatedProductCustoms,
 } from './entities';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { RequireAnyPermission } from '../auth/decorators/permissions.decorator';
+import { PRODUCT_CUSTOM_PERMISSIONS } from '../permissions/constants/permissions.constants';
+
+// Custom decorator to mark routes as public
+const Public = () => SetMetadata('isPublic', true);
 
 @Controller('product-customs')
+@UseGuards(JwtGuard, PermissionGuard)
 export class ProductCustomsController {
   constructor(private readonly productCustomsService: ProductCustomsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @RequireAnyPermission(
+    PRODUCT_CUSTOM_PERMISSIONS.CREATE,
+    PRODUCT_CUSTOM_PERMISSIONS.MANAGE,
+  )
   async create(
     @Body() createProductCustomDto: CreateProductCustomDto,
   ): Promise<ProductCustomWithRelations> {
     return this.productCustomsService.create(createProductCustomDto);
   }
 
+  @Public()
   @Get()
   async findAll(
     @Query() query: GetProductCustomsQueryDto,
@@ -42,6 +57,10 @@ export class ProductCustomsController {
   }
 
   @Get('statistics')
+  @RequireAnyPermission(
+    PRODUCT_CUSTOM_PERMISSIONS.VIEW,
+    PRODUCT_CUSTOM_PERMISSIONS.MANAGE,
+  )
   async getStatistics(): Promise<{
     totalProductCustoms: number;
     totalInventories: number;
@@ -51,6 +70,7 @@ export class ProductCustomsController {
     return this.productCustomsService.getStatistics();
   }
 
+  @Public()
   @Get('category/:productCategoryId')
   async findByProductCategoryId(
     @Param('productCategoryId', ParseUUIDPipe) productCategoryId: string,
@@ -60,6 +80,7 @@ export class ProductCustomsController {
     );
   }
 
+  @Public()
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
@@ -68,6 +89,10 @@ export class ProductCustomsController {
   }
 
   @Patch(':id')
+  @RequireAnyPermission(
+    PRODUCT_CUSTOM_PERMISSIONS.UPDATE,
+    PRODUCT_CUSTOM_PERMISSIONS.MANAGE,
+  )
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductCustomDto: UpdateProductCustomDto,
@@ -76,6 +101,10 @@ export class ProductCustomsController {
   }
 
   @Patch(':id/status')
+  @RequireAnyPermission(
+    PRODUCT_CUSTOM_PERMISSIONS.UPDATE,
+    PRODUCT_CUSTOM_PERMISSIONS.MANAGE,
+  )
   async updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Body('status') status: string,
@@ -85,6 +114,10 @@ export class ProductCustomsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
+  @RequireAnyPermission(
+    PRODUCT_CUSTOM_PERMISSIONS.DELETE,
+    PRODUCT_CUSTOM_PERMISSIONS.MANAGE,
+  )
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<{ message: string }> {

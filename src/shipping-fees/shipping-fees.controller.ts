@@ -10,6 +10,8 @@ import {
   HttpStatus,
   ParseUUIDPipe,
   ValidationPipe,
+  UseGuards,
+  SetMetadata,
 } from '@nestjs/common';
 import { ShippingFeesService } from './shipping-fees.service';
 import { CreateShippingFeeDto } from './dto/create-shipping-fee.dto';
@@ -19,12 +21,24 @@ import {
   ShippingFeeResponseDto,
   PaginatedShippingFeesResponseDto,
 } from './dto/shipping-fee-response.dto';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { RequireAnyPermission } from '../auth/decorators/permissions.decorator';
+import { SHIPPING_FEE_PERMISSIONS } from '../permissions/constants/permissions.constants';
+
+// Custom decorator to mark routes as public
+const Public = () => SetMetadata('isPublic', true);
 
 @Controller('shipping-fees')
+@UseGuards(JwtGuard, PermissionGuard)
 export class ShippingFeesController {
   constructor(private readonly shippingFeesService: ShippingFeesService) {}
 
   @Post()
+  @RequireAnyPermission(
+    SHIPPING_FEE_PERMISSIONS.CREATE,
+    SHIPPING_FEE_PERMISSIONS.MANAGE,
+  )
   async create(@Body() createShippingFeeDto: CreateShippingFeeDto) {
     const result = await this.shippingFeesService.create(createShippingFeeDto);
 
@@ -37,6 +51,7 @@ export class ShippingFeesController {
     };
   }
 
+  @Public()
   @Get()
   async findAll(@Query() filterDto: FilterShippingFeeDto) {
     const result = await this.shippingFeesService.findAll(filterDto);
@@ -47,6 +62,7 @@ export class ShippingFeesController {
     };
   }
 
+  @Public()
   @Get('areas')
   async getDistinctAreas() {
     const result = await this.shippingFeesService.getDistinctAreas();
@@ -57,6 +73,7 @@ export class ShippingFeesController {
     };
   }
 
+  @Public()
   @Get('shipping-types')
   async getDistinctShippingTypes() {
     const result = await this.shippingFeesService.getDistinctShippingTypes();
@@ -68,6 +85,10 @@ export class ShippingFeesController {
   }
 
   @Get('statistics')
+  @RequireAnyPermission(
+    SHIPPING_FEE_PERMISSIONS.VIEW,
+    SHIPPING_FEE_PERMISSIONS.MANAGE,
+  )
   async getStatistics() {
     const result = await this.shippingFeesService.getStatistics();
     return {
@@ -77,6 +98,7 @@ export class ShippingFeesController {
     };
   }
 
+  @Public()
   @Get('by-area/:area')
   async getShippingFeesByArea(@Param('area') area: string) {
     const result = await this.shippingFeesService.getShippingFeesByArea(area);
@@ -87,6 +109,7 @@ export class ShippingFeesController {
     };
   }
 
+  @Public()
   @Get('search')
   async findByAreaAndType(
     @Query('area') area: string,
@@ -103,6 +126,7 @@ export class ShippingFeesController {
     };
   }
 
+  @Public()
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const result = await this.shippingFeesService.findOne(id);
@@ -114,6 +138,10 @@ export class ShippingFeesController {
   }
 
   @Patch(':id')
+  @RequireAnyPermission(
+    SHIPPING_FEE_PERMISSIONS.UPDATE,
+    SHIPPING_FEE_PERMISSIONS.MANAGE,
+  )
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateShippingFeeDto: UpdateShippingFeeDto,
@@ -130,6 +158,10 @@ export class ShippingFeesController {
   }
 
   @Delete(':id')
+  @RequireAnyPermission(
+    SHIPPING_FEE_PERMISSIONS.DELETE,
+    SHIPPING_FEE_PERMISSIONS.MANAGE,
+  )
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     const result = await this.shippingFeesService.remove(id);
     return {

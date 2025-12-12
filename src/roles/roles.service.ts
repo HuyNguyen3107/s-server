@@ -26,12 +26,33 @@ export class RolesService {
         data: {
           name: createRoleDto.name,
         },
+        include: {
+          rolePermissions: {
+            include: {
+              permission: true,
+            },
+          },
+          _count: {
+            select: {
+              userRoles: true,
+              rolePermissions: true,
+            },
+          },
+        },
       });
 
       return {
         success: true,
         message: 'Tạo vai trò thành công',
-        data: role,
+        data: {
+          id: role.id,
+          name: role.name,
+          isDeletable: role.isDeletable,
+          createdAt: role.createdAt,
+          permissions: role.rolePermissions.map((rp) => rp.permission),
+          userCount: role._count.userRoles,
+          permissionCount: role._count.rolePermissions,
+        },
       };
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -103,6 +124,12 @@ export class RolesService {
               },
             },
           },
+          _count: {
+            select: {
+              userRoles: true,
+              rolePermissions: true,
+            },
+          },
         },
       });
 
@@ -117,6 +144,8 @@ export class RolesService {
         createdAt: role.createdAt,
         permissions: role.rolePermissions.map((rp) => rp.permission),
         users: role.userRoles.map((ur) => ur.user),
+        userCount: role._count.userRoles,
+        permissionCount: role._count.rolePermissions,
       };
 
       return {
@@ -150,7 +179,8 @@ export class RolesService {
       }
 
       if (updateRoleDto.name) {
-        const roleWithSameName = await this.prisma.role.findUnique({
+        // Sử dụng findFirst thay vì findUnique để hỗ trợ điều kiện NOT
+        const roleWithSameName = await this.prisma.role.findFirst({
           where: {
             name: updateRoleDto.name,
             NOT: { id },
@@ -171,6 +201,12 @@ export class RolesService {
               permission: true,
             },
           },
+          _count: {
+            select: {
+              userRoles: true,
+              rolePermissions: true,
+            },
+          },
         },
       });
 
@@ -183,6 +219,8 @@ export class RolesService {
           isDeletable: updatedRole.isDeletable,
           createdAt: updatedRole.createdAt,
           permissions: updatedRole.rolePermissions.map((rp) => rp.permission),
+          userCount: updatedRole._count.userRoles,
+          permissionCount: updatedRole._count.rolePermissions,
         },
       };
     } catch (error) {
@@ -226,8 +264,17 @@ export class RolesService {
         );
       }
 
-      await this.prisma.role.delete({
-        where: { id },
+      // Sử dụng transaction để đảm bảo xóa cả rolePermissions và role
+      await this.prisma.$transaction(async (tx) => {
+        // Xóa tất cả rolePermissions liên quan trước
+        await tx.rolePermission.deleteMany({
+          where: { roleId: id },
+        });
+
+        // Sau đó xóa role
+        await tx.role.delete({
+          where: { id },
+        });
       });
 
       return {
@@ -241,6 +288,7 @@ export class RolesService {
       ) {
         throw error;
       }
+      console.error('Delete role error:', error);
       throw new BadRequestException('Không thể xóa vai trò');
     }
   }

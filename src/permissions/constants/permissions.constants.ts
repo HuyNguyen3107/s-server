@@ -4,6 +4,9 @@
  * ============================================
  * Format: module.action
  * Ví dụ: users.view, orders.create
+ *
+ * LƯU Ý: File này chứa TẤT CẢ các quyền THỰC SỰ ĐƯỢC SỬ DỤNG trong hệ thống
+ * Không thêm quyền thừa không có trong API
  */
 
 // ============================================
@@ -63,16 +66,6 @@ export const ROLE_PERMISSION_PERMISSIONS = {
 };
 
 // ============================================
-// QUYỀN GÁN QUYỀN TRỰC TIẾP CHO NGƯỜI DÙNG
-// ============================================
-export const USER_PERMISSION_PERMISSIONS = {
-  VIEW: 'user-permissions.view',
-  ASSIGN: 'user-permissions.assign',
-  REVOKE: 'user-permissions.revoke',
-  MANAGE: 'user-permissions.manage',
-};
-
-// ============================================
 // QUYỀN QUẢN LÝ BỘ SƯU TẬP
 // ============================================
 export const COLLECTION_PERMISSIONS = {
@@ -80,7 +73,6 @@ export const COLLECTION_PERMISSIONS = {
   CREATE: 'collections.create',
   UPDATE: 'collections.update',
   DELETE: 'collections.delete',
-  LIST: 'collections.list',
   MANAGE: 'collections.manage',
 };
 
@@ -92,7 +84,6 @@ export const PRODUCT_PERMISSIONS = {
   CREATE: 'products.create',
   UPDATE: 'products.update',
   DELETE: 'products.delete',
-  LIST: 'products.list',
   MANAGE: 'products.manage',
 };
 
@@ -104,7 +95,6 @@ export const PRODUCT_VARIANT_PERMISSIONS = {
   CREATE: 'product-variants.create',
   UPDATE: 'product-variants.update',
   DELETE: 'product-variants.delete',
-  LIST: 'product-variants.list',
   MANAGE: 'product-variants.manage',
 };
 
@@ -116,7 +106,6 @@ export const PRODUCT_CATEGORY_PERMISSIONS = {
   CREATE: 'product-categories.create',
   UPDATE: 'product-categories.update',
   DELETE: 'product-categories.delete',
-  LIST: 'product-categories.list',
   MANAGE: 'product-categories.manage',
 };
 
@@ -128,7 +117,6 @@ export const PRODUCT_CUSTOM_PERMISSIONS = {
   CREATE: 'product-customs.create',
   UPDATE: 'product-customs.update',
   DELETE: 'product-customs.delete',
-  LIST: 'product-customs.list',
   MANAGE: 'product-customs.manage',
 };
 
@@ -140,7 +128,6 @@ export const BACKGROUND_PERMISSIONS = {
   CREATE: 'backgrounds.create',
   UPDATE: 'backgrounds.update',
   DELETE: 'backgrounds.delete',
-  LIST: 'backgrounds.list',
   MANAGE: 'backgrounds.manage',
 };
 
@@ -149,7 +136,6 @@ export const BACKGROUND_PERMISSIONS = {
 // ============================================
 export const ORDER_PERMISSIONS = {
   VIEW: 'orders.view',
-  CREATE: 'orders.create',
   UPDATE: 'orders.update',
   DELETE: 'orders.delete',
   LIST: 'orders.list',
@@ -157,7 +143,6 @@ export const ORDER_PERMISSIONS = {
   ASSIGN: 'orders.assign', // Nhận xử lý đơn hàng
   UPDATE_STATUS: 'orders.update-status', // Cập nhật trạng thái
   TRANSFER: 'orders.transfer', // Chuyển đơn hàng
-  EXPORT: 'orders.export', // Xuất dữ liệu đơn hàng
 };
 
 // ============================================
@@ -185,7 +170,6 @@ export const PROMOTION_PERMISSIONS = {
   DELETE: 'promotions.delete',
   LIST: 'promotions.list',
   MANAGE: 'promotions.manage',
-  VALIDATE: 'promotions.validate', // Kiểm tra mã khuyến mãi
 };
 
 // ============================================
@@ -196,7 +180,6 @@ export const SHIPPING_FEE_PERMISSIONS = {
   CREATE: 'shipping-fees.create',
   UPDATE: 'shipping-fees.update',
   DELETE: 'shipping-fees.delete',
-  LIST: 'shipping-fees.list',
   MANAGE: 'shipping-fees.manage',
 };
 
@@ -205,10 +188,8 @@ export const SHIPPING_FEE_PERMISSIONS = {
 // ============================================
 export const FEEDBACK_PERMISSIONS = {
   VIEW: 'feedbacks.view',
-  CREATE: 'feedbacks.create',
   UPDATE: 'feedbacks.update',
   DELETE: 'feedbacks.delete',
-  LIST: 'feedbacks.list',
   MANAGE: 'feedbacks.manage',
   RESPOND: 'feedbacks.respond', // Phản hồi
 };
@@ -218,10 +199,9 @@ export const FEEDBACK_PERMISSIONS = {
 // ============================================
 export const CONSULTATION_PERMISSIONS = {
   VIEW: 'consultations.view',
-  CREATE: 'consultations.create',
+  LIST: 'consultations.list',
   UPDATE: 'consultations.update',
   DELETE: 'consultations.delete',
-  LIST: 'consultations.list',
   MANAGE: 'consultations.manage',
 };
 
@@ -233,64 +213,16 @@ export const INFORMATION_PERMISSIONS = {
   CREATE: 'informations.create',
   UPDATE: 'informations.update',
   DELETE: 'informations.delete',
-  LIST: 'informations.list',
   MANAGE: 'informations.manage',
-};
-
-// ============================================
-// QUYỀN QUẢN LÝ THÔNG BÁO
-// ============================================
-export const NOTIFICATION_PERMISSIONS = {
-  VIEW: 'notifications.view',
-  CREATE: 'notifications.create',
-  UPDATE: 'notifications.update',
-  DELETE: 'notifications.delete',
-  LIST: 'notifications.list',
-  MANAGE: 'notifications.manage',
-  SEND: 'notifications.send', // Gửi thông báo
 };
 
 // ============================================
 // QUYỀN QUẢN LÝ UPLOAD
 // ============================================
 export const UPLOAD_PERMISSIONS = {
-  VIEW: 'upload.view',
   CREATE: 'upload.create',
   DELETE: 'upload.delete',
   MANAGE: 'upload.manage',
-};
-
-// ============================================
-// QUYỀN BÁO CÁO & THỐNG KÊ
-// ============================================
-export const REPORT_PERMISSIONS = {
-  VIEW: 'reports.view',
-  ORDERS: 'reports.orders', // Báo cáo đơn hàng
-  INVENTORY: 'reports.inventory', // Báo cáo kho
-  REVENUE: 'reports.revenue', // Báo cáo doanh thu
-  USERS: 'reports.users', // Báo cáo người dùng
-  EXPORT: 'reports.export', // Xuất báo cáo
-  MANAGE: 'reports.manage',
-};
-
-// ============================================
-// QUYỀN CÀI ĐẶT HỆ THỐNG
-// ============================================
-export const SETTINGS_PERMISSIONS = {
-  VIEW: 'settings.view',
-  UPDATE: 'settings.update',
-  MANAGE: 'settings.manage',
-};
-
-// ============================================
-// QUYỀN HỆ THỐNG (SUPER ADMIN)
-// ============================================
-export const SYSTEM_PERMISSIONS = {
-  ADMIN: 'system.admin', // Full quyền hệ thống
-  CONFIG: 'system.config', // Cấu hình hệ thống
-  BACKUP: 'system.backup', // Sao lưu dữ liệu
-  RESTORE: 'system.restore', // Khôi phục dữ liệu
-  LOGS: 'system.logs', // Xem logs
 };
 
 // ============================================
@@ -302,7 +234,6 @@ export const PERMISSION_GROUPS = {
   PERMISSION: Object.values(PERMISSION_PERMISSIONS),
   USER_ROLE: Object.values(USER_ROLE_PERMISSIONS),
   ROLE_PERMISSION: Object.values(ROLE_PERMISSION_PERMISSIONS),
-  USER_PERMISSION: Object.values(USER_PERMISSION_PERMISSIONS),
   COLLECTION: Object.values(COLLECTION_PERMISSIONS),
   PRODUCT: Object.values(PRODUCT_PERMISSIONS),
   PRODUCT_VARIANT: Object.values(PRODUCT_VARIANT_PERMISSIONS),
@@ -316,11 +247,7 @@ export const PERMISSION_GROUPS = {
   FEEDBACK: Object.values(FEEDBACK_PERMISSIONS),
   CONSULTATION: Object.values(CONSULTATION_PERMISSIONS),
   INFORMATION: Object.values(INFORMATION_PERMISSIONS),
-  NOTIFICATION: Object.values(NOTIFICATION_PERMISSIONS),
   UPLOAD: Object.values(UPLOAD_PERMISSIONS),
-  REPORT: Object.values(REPORT_PERMISSIONS),
-  SETTINGS: Object.values(SETTINGS_PERMISSIONS),
-  SYSTEM: Object.values(SYSTEM_PERMISSIONS),
 };
 
 // ============================================
@@ -329,98 +256,19 @@ export const PERMISSION_GROUPS = {
 export const ALL_PERMISSIONS = Object.values(PERMISSION_GROUPS).flat();
 
 // ============================================
-// LEGACY SUPPORT - Tương thích ngược
-// ============================================
-export const COMMON_PERMISSIONS = {
-  // User permissions
-  USER_CREATE: USER_PERMISSIONS.CREATE,
-  USER_READ: USER_PERMISSIONS.VIEW,
-  USER_UPDATE: USER_PERMISSIONS.UPDATE,
-  USER_DELETE: USER_PERMISSIONS.DELETE,
-  USER_LIST: USER_PERMISSIONS.LIST,
-
-  // Role permissions
-  ROLE_CREATE: ROLE_PERMISSIONS.CREATE,
-  ROLE_READ: ROLE_PERMISSIONS.VIEW,
-  ROLE_UPDATE: ROLE_PERMISSIONS.UPDATE,
-  ROLE_DELETE: ROLE_PERMISSIONS.DELETE,
-  ROLE_LIST: ROLE_PERMISSIONS.LIST,
-
-  // Permission permissions
-  PERMISSION_CREATE: PERMISSION_PERMISSIONS.CREATE,
-  PERMISSION_READ: PERMISSION_PERMISSIONS.VIEW,
-  PERMISSION_UPDATE: PERMISSION_PERMISSIONS.UPDATE,
-  PERMISSION_DELETE: PERMISSION_PERMISSIONS.DELETE,
-  PERMISSION_LIST: PERMISSION_PERMISSIONS.LIST,
-
-  // Product permissions
-  PRODUCT_CREATE: PRODUCT_PERMISSIONS.CREATE,
-  PRODUCT_READ: PRODUCT_PERMISSIONS.VIEW,
-  PRODUCT_UPDATE: PRODUCT_PERMISSIONS.UPDATE,
-  PRODUCT_DELETE: PRODUCT_PERMISSIONS.DELETE,
-  PRODUCT_LIST: PRODUCT_PERMISSIONS.LIST,
-
-  // Collection permissions
-  COLLECTION_CREATE: COLLECTION_PERMISSIONS.CREATE,
-  COLLECTION_READ: COLLECTION_PERMISSIONS.VIEW,
-  COLLECTION_UPDATE: COLLECTION_PERMISSIONS.UPDATE,
-  COLLECTION_DELETE: COLLECTION_PERMISSIONS.DELETE,
-  COLLECTION_LIST: COLLECTION_PERMISSIONS.LIST,
-
-  // Order permissions
-  ORDER_CREATE: ORDER_PERMISSIONS.CREATE,
-  ORDER_READ: ORDER_PERMISSIONS.VIEW,
-  ORDER_UPDATE: ORDER_PERMISSIONS.UPDATE,
-  ORDER_DELETE: ORDER_PERMISSIONS.DELETE,
-  ORDER_LIST: ORDER_PERMISSIONS.LIST,
-  ORDER_MANAGE: ORDER_PERMISSIONS.MANAGE,
-
-  // Inventory permissions
-  INVENTORY_READ: INVENTORY_PERMISSIONS.VIEW,
-  INVENTORY_UPDATE: INVENTORY_PERMISSIONS.UPDATE,
-  INVENTORY_MANAGE: INVENTORY_PERMISSIONS.MANAGE,
-
-  // Promotion permissions
-  PROMOTION_CREATE: PROMOTION_PERMISSIONS.CREATE,
-  PROMOTION_READ: PROMOTION_PERMISSIONS.VIEW,
-  PROMOTION_UPDATE: PROMOTION_PERMISSIONS.UPDATE,
-  PROMOTION_DELETE: PROMOTION_PERMISSIONS.DELETE,
-  PROMOTION_LIST: PROMOTION_PERMISSIONS.LIST,
-
-  // Feedback permissions
-  FEEDBACK_READ: FEEDBACK_PERMISSIONS.VIEW,
-  FEEDBACK_UPDATE: FEEDBACK_PERMISSIONS.UPDATE,
-  FEEDBACK_DELETE: FEEDBACK_PERMISSIONS.DELETE,
-  FEEDBACK_LIST: FEEDBACK_PERMISSIONS.LIST,
-
-  // Information permissions
-  INFORMATION_CREATE: INFORMATION_PERMISSIONS.CREATE,
-  INFORMATION_READ: INFORMATION_PERMISSIONS.VIEW,
-  INFORMATION_UPDATE: INFORMATION_PERMISSIONS.UPDATE,
-  INFORMATION_DELETE: INFORMATION_PERMISSIONS.DELETE,
-  INFORMATION_LIST: INFORMATION_PERMISSIONS.LIST,
-
-  // System permissions
-  SYSTEM_ADMIN: SYSTEM_PERMISSIONS.ADMIN,
-  SYSTEM_CONFIG: SYSTEM_PERMISSIONS.CONFIG,
-  SYSTEM_REPORT: REPORT_PERMISSIONS.MANAGE,
-};
-
-// ============================================
 // DEFAULT ROLE PERMISSIONS
 // ============================================
 
 // Quyền cho Super Admin - TẤT CẢ QUYỀN
 export const SUPER_ADMIN_PERMISSIONS = ALL_PERMISSIONS;
 
-// Quyền cho Admin - Hầu hết quyền trừ system
+// Quyền cho Admin - Hầu hết quyền
 export const ADMIN_PERMISSIONS = [
   ...PERMISSION_GROUPS.USER,
   ...PERMISSION_GROUPS.ROLE,
   ...PERMISSION_GROUPS.PERMISSION,
   ...PERMISSION_GROUPS.USER_ROLE,
   ...PERMISSION_GROUPS.ROLE_PERMISSION,
-  ...PERMISSION_GROUPS.USER_PERMISSION,
   ...PERMISSION_GROUPS.COLLECTION,
   ...PERMISSION_GROUPS.PRODUCT,
   ...PERMISSION_GROUPS.PRODUCT_VARIANT,
@@ -434,10 +282,7 @@ export const ADMIN_PERMISSIONS = [
   ...PERMISSION_GROUPS.FEEDBACK,
   ...PERMISSION_GROUPS.CONSULTATION,
   ...PERMISSION_GROUPS.INFORMATION,
-  ...PERMISSION_GROUPS.NOTIFICATION,
   ...PERMISSION_GROUPS.UPLOAD,
-  ...PERMISSION_GROUPS.REPORT,
-  ...PERMISSION_GROUPS.SETTINGS,
 ];
 
 // Quyền cho Staff - Quản lý đơn hàng và sản phẩm cơ bản
@@ -448,26 +293,14 @@ export const STAFF_PERMISSIONS = [
   // Xem vai trò
   ROLE_PERMISSIONS.VIEW,
   ROLE_PERMISSIONS.LIST,
-  // Quản lý sản phẩm cơ bản
-  ...PERMISSION_GROUPS.COLLECTION.filter(
-    (p) => !p.includes('delete') && !p.includes('manage'),
-  ),
-  ...PERMISSION_GROUPS.PRODUCT.filter(
-    (p) => !p.includes('delete') && !p.includes('manage'),
-  ),
-  ...PERMISSION_GROUPS.PRODUCT_VARIANT.filter(
-    (p) => !p.includes('delete') && !p.includes('manage'),
-  ),
-  ...PERMISSION_GROUPS.PRODUCT_CATEGORY.filter(
-    (p) => !p.includes('delete') && !p.includes('manage'),
-  ),
-  ...PERMISSION_GROUPS.PRODUCT_CUSTOM.filter(
-    (p) => !p.includes('delete') && !p.includes('manage'),
-  ),
-  ...PERMISSION_GROUPS.BACKGROUND.filter(
-    (p) => !p.includes('delete') && !p.includes('manage'),
-  ),
-  // Quản lý đơn hàng đầy đủ
+  // Xem sản phẩm
+  COLLECTION_PERMISSIONS.VIEW,
+  PRODUCT_PERMISSIONS.VIEW,
+  PRODUCT_VARIANT_PERMISSIONS.VIEW,
+  PRODUCT_CATEGORY_PERMISSIONS.VIEW,
+  PRODUCT_CUSTOM_PERMISSIONS.VIEW,
+  BACKGROUND_PERMISSIONS.VIEW,
+  // Quản lý đơn hàng
   ...PERMISSION_GROUPS.ORDER,
   // Quản lý kho cơ bản
   INVENTORY_PERMISSIONS.VIEW,
@@ -477,26 +310,16 @@ export const STAFF_PERMISSIONS = [
   // Xem khuyến mãi
   PROMOTION_PERMISSIONS.VIEW,
   PROMOTION_PERMISSIONS.LIST,
-  PROMOTION_PERMISSIONS.VALIDATE,
   // Xem phí vận chuyển
   SHIPPING_FEE_PERMISSIONS.VIEW,
-  SHIPPING_FEE_PERMISSIONS.LIST,
   // Quản lý phản hồi
   ...PERMISSION_GROUPS.FEEDBACK,
   // Quản lý tư vấn
   ...PERMISSION_GROUPS.CONSULTATION,
   // Xem thông tin
   INFORMATION_PERMISSIONS.VIEW,
-  INFORMATION_PERMISSIONS.LIST,
-  // Thông báo
-  NOTIFICATION_PERMISSIONS.VIEW,
-  NOTIFICATION_PERMISSIONS.LIST,
   // Upload
-  UPLOAD_PERMISSIONS.VIEW,
   UPLOAD_PERMISSIONS.CREATE,
-  // Xem báo cáo cơ bản
-  REPORT_PERMISSIONS.VIEW,
-  REPORT_PERMISSIONS.ORDERS,
 ];
 
 // Quyền cho Viewer - Chỉ xem
@@ -504,17 +327,11 @@ export const VIEWER_PERMISSIONS = [
   USER_PERMISSIONS.VIEW,
   ROLE_PERMISSIONS.VIEW,
   COLLECTION_PERMISSIONS.VIEW,
-  COLLECTION_PERMISSIONS.LIST,
   PRODUCT_PERMISSIONS.VIEW,
-  PRODUCT_PERMISSIONS.LIST,
   PRODUCT_VARIANT_PERMISSIONS.VIEW,
-  PRODUCT_VARIANT_PERMISSIONS.LIST,
   PRODUCT_CATEGORY_PERMISSIONS.VIEW,
-  PRODUCT_CATEGORY_PERMISSIONS.LIST,
   PRODUCT_CUSTOM_PERMISSIONS.VIEW,
-  PRODUCT_CUSTOM_PERMISSIONS.LIST,
   BACKGROUND_PERMISSIONS.VIEW,
-  BACKGROUND_PERMISSIONS.LIST,
   ORDER_PERMISSIONS.VIEW,
   ORDER_PERMISSIONS.LIST,
   INVENTORY_PERMISSIONS.VIEW,
@@ -522,14 +339,8 @@ export const VIEWER_PERMISSIONS = [
   PROMOTION_PERMISSIONS.VIEW,
   PROMOTION_PERMISSIONS.LIST,
   SHIPPING_FEE_PERMISSIONS.VIEW,
-  SHIPPING_FEE_PERMISSIONS.LIST,
   FEEDBACK_PERMISSIONS.VIEW,
-  FEEDBACK_PERMISSIONS.LIST,
   CONSULTATION_PERMISSIONS.VIEW,
   CONSULTATION_PERMISSIONS.LIST,
   INFORMATION_PERMISSIONS.VIEW,
-  INFORMATION_PERMISSIONS.LIST,
-  NOTIFICATION_PERMISSIONS.VIEW,
-  NOTIFICATION_PERMISSIONS.LIST,
-  REPORT_PERMISSIONS.VIEW,
 ];

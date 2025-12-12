@@ -1,15 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
-
-// Lấy thông tin super admin từ biến môi trường hoặc dùng mặc định
-const SUPER_ADMIN_EMAIL =
-  process.env.SUPER_ADMIN_EMAIL || 'superadmin@soligant.com';
-const SUPER_ADMIN_PASSWORD =
-  process.env.SUPER_ADMIN_PASSWORD || 'SuperAdmin@2024';
-const SUPER_ADMIN_NAME = process.env.SUPER_ADMIN_NAME || 'Super Administrator';
-const SUPER_ADMIN_PHONE = process.env.SUPER_ADMIN_PHONE || '0999999999';
 
 /**
  * Danh sách TẤT CẢ quyền trong hệ thống
@@ -195,142 +186,104 @@ const ALL_PERMISSIONS = [
   'upload.manage',
 ];
 
-async function seedSuperAdmin() {
+async function syncPermissions() {
+  console.log('🔄 Bắt đầu đồng bộ permissions...');
+  console.log(`📋 Tổng số quyền cần đồng bộ: ${ALL_PERMISSIONS.length}`);
+
   try {
-    console.log('🚀 Bắt đầu tạo Super Admin...');
-    console.log(`📧 Email: ${SUPER_ADMIN_EMAIL}`);
-    console.log(`📋 Tổng số quyền: ${ALL_PERMISSIONS.length}`);
+    // Lấy danh sách permissions hiện tại
+    const existingPermissions = await prisma.permission.findMany();
+    const existingPermissionNames = new Set(existingPermissions.map((p) => p.name));
+    const newPermissionNames = new Set(ALL_PERMISSIONS);
 
-    // Đảm bảo role Super Admin tồn tại với isDeletable = false
-    const superAdminRole = await prisma.role.upsert({
-      where: { name: 'Super Admin' },
-      update: {
-        isDeletable: false, // Không thể xóa
-      },
-      create: {
-        name: 'Super Admin',
-        isDeletable: false, // Không thể xóa
-      },
-    });
-    console.log('✅ Role Super Admin đã được tạo/cập nhật');
-
-    // Xóa TẤT CẢ permissions cũ trong hệ thống
-    console.log('🗑️ Đang xóa các quyền cũ...');
-    await prisma.rolePermission.deleteMany({});
-    await prisma.permission.deleteMany({});
-    console.log('✅ Đã xóa tất cả quyền cũ');
-
-    // Tạo tất cả permissions mới
-    console.log('📝 Đang tạo các quyền mới...');
-    const createdPermissions = [];
-    for (const permissionName of ALL_PERMISSIONS) {
-      const permission = await prisma.permission.create({
-        data: { name: permissionName },
-      });
-      createdPermissions.push(permission);
-    }
-    console.log(`✅ Đã tạo ${createdPermissions.length} permissions mới`);
-
-    // Gán tất cả permissions cho Super Admin role
-    await prisma.rolePermission.createMany({
-      data: createdPermissions.map((permission) => ({
-        roleId: superAdminRole.id,
-        permissionId: permission.id,
-      })),
-    });
-    console.log('✅ Đã gán tất cả permissions cho Super Admin role');
-
-    // Hash mật khẩu
-    const passwordHash = await bcrypt.hash(SUPER_ADMIN_PASSWORD, 10);
-
-    // Tạo tài khoản Super Admin với isDeletable = false
-    const superAdmin = await prisma.user.upsert({
-      where: { email: SUPER_ADMIN_EMAIL },
-      update: {
-        passwordHash,
-        name: SUPER_ADMIN_NAME,
-        isActive: true,
-        isDeletable: false, // Không thể xóa
-      },
-      create: {
-        email: SUPER_ADMIN_EMAIL,
-        passwordHash,
-        name: SUPER_ADMIN_NAME,
-        phone: SUPER_ADMIN_PHONE,
-        isActive: true,
-        isDeletable: false, // Không thể xóa
-      },
-    });
-    console.log(
-      `✅ Tài khoản Super Admin đã được tạo/cập nhật: ${superAdmin.email}`,
+    // Tìm permissions cần xóa (có trong DB nhưng không có trong danh sách mới)
+    const permissionsToDelete = existingPermissions.filter(
+      (p) => !newPermissionNames.has(p.name),
     );
 
-    // Gán Super Admin role cho user
-    await prisma.userRole.upsert({
-      where: {
-        idx_user_roles_unique: {
-          userId: superAdmin.id,
-          roleId: superAdminRole.id,
-        },
-      },
-      update: {},
-      create: {
-        userId: superAdmin.id,
-        roleId: superAdminRole.id,
-      },
-    });
-    console.log('✅ Đã gán role Super Admin cho user');
+    // Tìm permissions cần thêm (có trong danh sách mới nhưng không có trong DB)
+    const permissionsToAdd = ALL_PERMISSIONS.filter(
+      (name) => !existingPermissionNames.has(name),
+    );
 
-    // In danh sách quyền theo nhóm
-    console.log('\n📋 DANH SÁCH QUYỀN THEO NHÓM:');
-    const groups = {
-      'Người dùng': ALL_PERMISSIONS.filter((p) => p.startsWith('users.')),
-      'Vai trò': ALL_PERMISSIONS.filter((p) => p.startsWith('roles.')),
-      'Quyền hạn': ALL_PERMISSIONS.filter((p) => p.startsWith('permissions.')),
-      'Gán vai trò': ALL_PERMISSIONS.filter((p) => p.startsWith('user-roles.')),
-      'Gán quyền vai trò': ALL_PERMISSIONS.filter((p) =>
-        p.startsWith('role-permissions.'),
-      ),
-      'Bộ sưu tập': ALL_PERMISSIONS.filter((p) => p.startsWith('collections.')),
-      'Sản phẩm': ALL_PERMISSIONS.filter((p) => p.startsWith('products.')),
-      'Biến thể SP': ALL_PERMISSIONS.filter((p) =>
-        p.startsWith('product-variants.'),
-      ),
-      'Danh mục SP': ALL_PERMISSIONS.filter((p) =>
-        p.startsWith('product-categories.'),
-      ),
-      'SP tùy chỉnh': ALL_PERMISSIONS.filter((p) =>
-        p.startsWith('product-customs.'),
-      ),
-      'Background': ALL_PERMISSIONS.filter((p) => p.startsWith('backgrounds.')),
-      'Đơn hàng': ALL_PERMISSIONS.filter((p) => p.startsWith('orders.')),
-      'Kho hàng': ALL_PERMISSIONS.filter((p) => p.startsWith('inventory.')),
-      'Khuyến mãi': ALL_PERMISSIONS.filter((p) => p.startsWith('promotions.')),
-      'Phí vận chuyển': ALL_PERMISSIONS.filter((p) =>
-        p.startsWith('shipping-fees.'),
-      ),
-      'Phản hồi': ALL_PERMISSIONS.filter((p) => p.startsWith('feedbacks.')),
-      'Tư vấn': ALL_PERMISSIONS.filter((p) => p.startsWith('consultations.')),
-      'Thông tin': ALL_PERMISSIONS.filter((p) => p.startsWith('informations.')),
-      Upload: ALL_PERMISSIONS.filter((p) => p.startsWith('upload.')),
-    };
-
-    for (const [groupName, permissions] of Object.entries(groups)) {
-      console.log(`  ${groupName}: ${permissions.length} quyền`);
+    // Xóa permissions không còn sử dụng
+    if (permissionsToDelete.length > 0) {
+      console.log(`\n🗑️ Xóa ${permissionsToDelete.length} quyền cũ không sử dụng:`);
+      
+      for (const permission of permissionsToDelete) {
+        // Xóa role_permissions liên quan trước
+        await prisma.rolePermission.deleteMany({
+          where: { permissionId: permission.id },
+        });
+        
+        // Xóa permission
+        await prisma.permission.delete({
+          where: { id: permission.id },
+        });
+        
+        console.log(`   - Đã xóa: ${permission.name}`);
+      }
+    } else {
+      console.log('\n✅ Không có quyền cũ cần xóa');
     }
 
-    console.log('\n🎉 Super Admin đã được tạo thành công!');
-    console.log('📌 Thông tin đăng nhập:');
-    console.log(`   Email: ${SUPER_ADMIN_EMAIL}`);
-    console.log(`   Password: ${SUPER_ADMIN_PASSWORD}`);
+    // Thêm permissions mới
+    if (permissionsToAdd.length > 0) {
+      console.log(`\n📝 Thêm ${permissionsToAdd.length} quyền mới:`);
+      
+      for (const permissionName of permissionsToAdd) {
+        await prisma.permission.create({
+          data: { name: permissionName },
+        });
+        console.log(`   + Đã thêm: ${permissionName}`);
+      }
+    } else {
+      console.log('\n✅ Không có quyền mới cần thêm');
+    }
+
+    // Cập nhật Super Admin role với tất cả permissions
+    const superAdminRole = await prisma.role.findFirst({
+      where: { name: 'Super Admin' },
+    });
+
+    if (superAdminRole) {
+      console.log('\n👑 Cập nhật quyền cho Super Admin role...');
+      
+      // Lấy tất cả permissions hiện tại
+      const allPermissions = await prisma.permission.findMany();
+      
+      // Xóa role permissions cũ của Super Admin
+      await prisma.rolePermission.deleteMany({
+        where: { roleId: superAdminRole.id },
+      });
+      
+      // Gán tất cả permissions cho Super Admin
+      await prisma.rolePermission.createMany({
+        data: allPermissions.map((p) => ({
+          roleId: superAdminRole.id,
+          permissionId: p.id,
+        })),
+      });
+      
+      console.log(`✅ Super Admin đã được gán ${allPermissions.length} quyền`);
+    }
+
+    // Thống kê cuối cùng
+    const finalCount = await prisma.permission.count();
+    console.log(`\n📊 Thống kê:`);
+    console.log(`   - Quyền đã xóa: ${permissionsToDelete.length}`);
+    console.log(`   - Quyền đã thêm: ${permissionsToAdd.length}`);
+    console.log(`   - Tổng quyền hiện tại: ${finalCount}`);
+    console.log('\n🎉 Đồng bộ permissions hoàn tất!');
+
   } catch (error) {
-    console.error('❌ Lỗi khi tạo Super Admin:', error);
+    console.error('❌ Lỗi khi đồng bộ permissions:', error);
     throw error;
   }
 }
 
 async function main() {
-  await seedSuperAdmin();
+  await syncPermissions();
 }
 
 main()
@@ -341,3 +294,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

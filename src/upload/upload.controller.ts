@@ -7,17 +7,24 @@ import {
   BadRequestException,
   Delete,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { UploadResponse } from '../cloudinary/cloudinary.interface';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { RequireAnyPermission } from '../auth/decorators/permissions.decorator';
+import { UPLOAD_PERMISSIONS } from '../permissions/constants/permissions.constants';
 
 @Controller('upload')
+@UseGuards(JwtGuard, PermissionGuard)
 export class UploadController {
   constructor(private readonly cloudinaryService: CloudinaryService) {}
 
   @Post('image')
   @UseInterceptors(FileInterceptor('file'))
+  @RequireAnyPermission(UPLOAD_PERMISSIONS.CREATE, UPLOAD_PERMISSIONS.MANAGE)
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadResponse> {
@@ -49,6 +56,7 @@ export class UploadController {
 
   @Post('images')
   @UseInterceptors(FilesInterceptor('files', 10)) // Max 10 files
+  @RequireAnyPermission(UPLOAD_PERMISSIONS.CREATE, UPLOAD_PERMISSIONS.MANAGE)
   async uploadImages(
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<UploadResponse> {
@@ -79,6 +87,7 @@ export class UploadController {
   }
 
   @Delete('image/:publicId')
+  @RequireAnyPermission(UPLOAD_PERMISSIONS.DELETE, UPLOAD_PERMISSIONS.MANAGE)
   async deleteImage(
     @Param('publicId') publicId: string,
   ): Promise<UploadResponse> {

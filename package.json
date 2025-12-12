@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && npm run sync:permissions",
+    "build:only": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -21,7 +22,8 @@
     "seed": "ts-node --transpile-only prisma/seed.ts",
     "generate": "node scripts/prisma-clean-generate.js",
     "seed:permissions": "ts-node --transpile-only scripts/seed-permissions.ts",
-    "seed:super-admin": "ts-node --transpile-only scripts/seed-super-admin.ts"
+    "seed:super-admin": "ts-node --transpile-only scripts/seed-super-admin.ts",
+    "sync:permissions": "ts-node --transpile-only scripts/sync-permissions.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
