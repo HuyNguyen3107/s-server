@@ -5,27 +5,12 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // CORS configuration:
-  // - If CORS_ORIGIN is set, only allow that specific origin
-  // - If CORS_ORIGIN is not set, allow all origins (for development/flexibility)
-  // - Always allow requests without origin header (e.g. curl, native apps)
-  const allowedOrigin = process.env.CORS_ORIGIN;
-
+  // CORS configuration: Allow all origins
   app.enableCors({
-    origin: (origin, callback) => {
-      // Allow requests without origin header (curl, Postman, native apps)
-      if (!origin) return callback(null, true);
-
-      // If CORS_ORIGIN is not set, allow all origins
-      if (!allowedOrigin) return callback(null, true);
-
-      // If CORS_ORIGIN is set, only allow that specific origin
-      if (origin === allowedOrigin) return callback(null, true);
-
-      // Reject all other origins
-      return callback(new Error('Not allowed by CORS'), false);
-    },
+    origin: true, // Allow all origins
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   // Enable global validation pipe with transform
